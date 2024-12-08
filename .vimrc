@@ -8,7 +8,7 @@ syntax enable             " Enable syntax highlighting
 
 " === Appearance ===
 set background=dark       " Set background to dark for better contrast
-colorscheme gruvbox       " Use gruvbox theme (similar to Atom)
+colorscheme darkblue " Use darkblue theme because its fun
 set termguicolors         " Enable 24-bit RGB colors
 set number                " Show line numbers
 set relativenumber        " Show relative line numbers
