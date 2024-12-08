@@ -1,68 +1,91 @@
 " Create a nvim config file in your personal home directory, at ~/.config/nvim/init.vim
 " Warning! You should already have neovim, nodejs, npm, python3, python3-pip installed! Ensure all are updated!
-" START UI PORTION
-set number            " Show line numbers
-set tabstop=4         " Number of spaces for a tab
-set shiftwidth=4      " Indentation levels use 4 spaces
-set expandtab         " Use spaces instead of tabs
-set autoindent        " Copy indent from current line when starting a new line
+" File: ~/.config/nvim/init.vim
+
+" General Settings
+set number               " Show line numbers
+set relativenumber       " Show relative line numbers
+set tabstop=4            " Number of spaces for a tab
+set shiftwidth=4         " Indentation levels use 4 spaces
+set expandtab            " Use spaces instead of tabs
+set autoindent           " Auto-indent new lines
 set clipboard=unnamedplus " Use system clipboard
-colorscheme darkblue
-set hlsearch          " Highlight search results
-set incsearch         " Show search matches as you type
-set ignorecase        " Ignore case in searches
-set cursorline        " Highlight the current line
-set termguicolors     " Enable true color support
-set scrolloff=8       " Keep 8 lines visible when scrolling
+set termguicolors        " Enable true color support
+set cursorline           " Highlight the current line
+set scrolloff=8          " Keep 8 lines visible when scrolling
+set wrap                 " Wrap long lines
+
+" Appearance - Atom-like UI
 syntax on                " Enable syntax highlighting
 set background=dark      " Set dark background
-" END UI PORTION
-" START FUNCTIONALITY PORTION
+colorscheme gruvbox      " Atom-like theme (requires gruvbox plugin)
+
+" Plugin Manager - vim-plug
 call plug#begin('~/.local/share/nvim/plugged')
 
-Plug 'nvim-tree/nvim-web-devicons'   
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'neovim/nvim-lspconfig'
+" Appearance Plugins
+Plug 'morhetz/gruvbox'               " Atom-like color scheme
+Plug 'nvim-tree/nvim-web-devicons'   " File icons
+
+" File Explorer
 Plug 'nvim-tree/nvim-tree.lua'
-Plug 'nvim-lualine/lualine.nvim'     
-Plug 'neovim/nvim-lspconfig'         
-Plug 'williamboman/mason.nvim'      
+
+" Status Line
+Plug 'nvim-lualine/lualine.nvim'     " VSCode-like status line
+
+" Treesitter for Better Syntax Highlighting
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+" LSP and Autocompletion
+Plug 'neovim/nvim-lspconfig'         " Core LSP support
+Plug 'williamboman/mason.nvim'       " LSP/DAP/Formatter installer
 Plug 'williamboman/mason-lspconfig.nvim'
-Plug 'hrsh7th/nvim-cmp'             
-Plug 'hrsh7th/cmp-nvim-lsp'         
-Plug 'hrsh7th/cmp-buffer'            
-Plug 'hrsh7th/cmp-path'             
-Plug 'L3MON4D3/LuaSnip'             
-Plug 'saadparwaiz1/cmp_luasnip'
-Plug 'mfussenegger/nvim-dap'
+Plug 'hrsh7th/nvim-cmp'              " Autocompletion framework
+Plug 'hrsh7th/cmp-nvim-lsp'          " LSP source for nvim-cmp
+Plug 'hrsh7th/cmp-buffer'            " Buffer source for nvim-cmp
+Plug 'hrsh7th/cmp-path'              " Path source for nvim-cmp
+Plug 'L3MON4D3/LuaSnip'              " Snippets engine
+Plug 'saadparwaiz1/cmp_luasnip'      " Snippets source for nvim-cmp
+
+" Debugger
+Plug 'mfussenegger/nvim-dap'         " Debug Adapter Protocol
+
+" Python Support
 Plug 'psf/black', {'branch': 'stable'} " Black formatter
+
+" JavaScript/TypeScript Support
 Plug 'jose-elias-alvarez/typescript.nvim'
+
+" C# Support
 Plug 'OmniSharp/omnisharp-vim'
+
+" Git Integration
 Plug 'tpope/vim-fugitive'
 
 call plug#end()
-" END FUNCTIONALITY PORTION
-" START LUA CONFIG
+
+" Lualine Configuration
 require('lualine').setup {
-    options = { theme = 'darkblue' },
+    options = { theme = 'gruvbox' },
 }
-"END LUA CONFIG
-"START TREESITTER CONFIG
+
+" Nvim Tree Configuration
 require("nvim-tree").setup()
+
+" Treesitter Configuration
 require'nvim-treesitter.configs'.setup {
     ensure_installed = { "python", "javascript", "c_sharp" },  " Languages to support
     highlight = { enable = true },  " Enable syntax highlighting
     indent = { enable = true },     " Enable smart indentation
 }
-"END TREESITTER CONFIG
-"START MASON CONFIG
+
+" Mason Configuration for LSP/DAP/Formatters
 require("mason").setup()
 require("mason-lspconfig").setup {
     ensure_installed = { "pyright", "tsserver", "omnisharp" }  " Language servers
 }
-"END MASON CONFIG
-"START LSP CONFIG
+
+" LSP Configuration
 local lspconfig = require'lspconfig'
 lspconfig.pyright.setup{}          " Python LSP
 lspconfig.tsserver.setup{}         " JavaScript/TypeScript LSP
@@ -87,9 +110,8 @@ cmp.setup {
         { name = 'buffer' },
     })
 }
-"END LSP CONFIG
 
-" KEYBINDS FOR COMMON FUNCTIONS
+" Key Bindings for Common Actions
 nnoremap <C-n> :NvimTreeToggle<CR> " Toggle file explorer
 nnoremap <C-f> :Telescope find_files<CR> " Find files
 nnoremap <leader>f :lua vim.lsp.buf.format()<CR> " Format code
