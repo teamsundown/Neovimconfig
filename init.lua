@@ -1,133 +1,120 @@
--- File: ~/.config/nvim/init.lua
+" === General Settings ===
+set nocompatible          " Disable Vi compatibility
+filetype off              " Disable filetype detection
 
--- Ensure true color support
-vim.opt.termguicolors = true
+" Enable filetype plugins and indentation
+filetype plugin indent on
+syntax enable             " Enable syntax highlighting
 
--- Set line numbers and indentation
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.tabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-vim.opt.autoindent = true
-vim.opt.wrap = true
-vim.opt.scrolloff = 8
-vim.opt.clipboard = "unnamedplus"
-vim.opt.cursorline = true
+" === Appearance ===
+set background=dark       " Set background to dark for better contrast
+colorscheme gruvbox       " Use gruvbox theme (similar to Atom)
+set termguicolors         " Enable 24-bit RGB colors
+set number                " Show line numbers
+set relativenumber        " Show relative line numbers
+set cursorline            " Highlight the current line
+set wrap                  " Enable word wrapping
+set showcmd               " Display incomplete commands
+set wildmenu              " Enhanced command-line completion
+set showmatch             " Highlight matching parentheses
 
--- Plugin manager installation (vim-plug is replaced with 'packer.nvim')
-local ensure_packer = function()
-  local fn = vim.fn
-  local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-  if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({
-      'git',
-      'clone',
-      '--depth',
-      '1',
-      'https://github.com/wbthomason/packer.nvim',
-      install_path
-    })
-    vim.cmd [[packadd packer.nvim]]
-    return true
-  end
-  return false
-end
+" === Atom-like Features ===
+set autoindent            " Enable automatic indentation
+set smartindent           " Smarter indentation
+set expandtab             " Use spaces instead of tabs
+set tabstop=4             " Number of spaces per tab
+set shiftwidth=4          " Spaces for auto-indents
+set softtabstop=4         " Spaces per tab press
+set clipboard=unnamedplus " Enable system clipboard integration
+set hidden                " Allow switching buffers without saving
+set splitbelow            " Open horizontal splits below
+set splitright            " Open vertical splits to the right
 
-local packer_bootstrap = ensure_packer()
+" === Plugin Manager ===
+call plug#begin('~/.vim/plugged')
 
--- Plugin configuration
-require('packer').startup(function(use)
-  -- Plugin manager
-  use 'wbthomason/packer.nvim'
+" Themes and Appearance
+Plug 'morhetz/gruvbox'               " Gruvbox theme
+Plug 'ryanoasis/vim-devicons'        " File icons
+Plug 'vim-airline/vim-airline'       " Statusline
+Plug 'vim-airline/vim-airline-themes'
 
-  -- Appearance and UI
-  use 'morhetz/gruvbox'                  -- Gruvbox theme
-  use 'nvim-tree/nvim-web-devicons'      -- File icons
-  use 'nvim-lualine/lualine.nvim'        -- Status line
+" LSP and Syntax Highlighting
+Plug 'neoclide/coc.nvim', {'branch': 'release'} " Completion and LSP
 
-  -- File Explorer
-  use 'nvim-tree/nvim-tree.lua'
+" File Navigation
+Plug 'preservim/nerdtree'            " File explorer
+Plug 'junegunn/fzf', {'do': './install --all'}  " Fuzzy finder
+Plug 'junegunn/fzf.vim'
 
-  -- Treesitter for Better Syntax Highlighting
-  use {
-    'nvim-treesitter/nvim-treesitter',
-    run = ':TSUpdate'
-  }
+" Git Integration
+Plug 'tpope/vim-fugitive'            " Git commands in Vim
 
-  -- LSP and Completion
-  use 'neovim/nvim-lspconfig'            -- Core LSP configuration
-  use 'williamboman/mason.nvim'          -- LSP/DAP/Formatter installer
-  use 'williamboman/mason-lspconfig.nvim'
-  use 'hrsh7th/nvim-cmp'                 -- Completion framework
-  use 'hrsh7th/cmp-nvim-lsp'             -- LSP source for nvim-cmp
-  use 'hrsh7th/cmp-buffer'               -- Buffer source for nvim-cmp
-  use 'hrsh7th/cmp-path'                 -- Path source for nvim-cmp
-  use 'L3MON4D3/LuaSnip'                 -- Snippet engine
-  use 'saadparwaiz1/cmp_luasnip'         -- Snippet source for nvim-cmp
+" Language-Specific Plugins
+Plug 'pangloss/vim-javascript'       " JavaScript syntax
+Plug 'leafgarland/typescript-vim'    " TypeScript support
+Plug 'vim-python/python-syntax'      " Python syntax highlighting
+Plug 'OmniSharp/omnisharp-vim'       " C# support
 
-  -- Debugging
-  use 'mfussenegger/nvim-dap'
+" Additional Features
+Plug 'airblade/vim-gitgutter'        " Git diff markers in the gutter
+Plug 'tpope/vim-commentary'          " Commenting helper
+Plug 'jiangmiao/auto-pairs'          " Auto-closing of parentheses and quotes
 
-  -- Language-Specific Plugins
-  use 'psf/black'                        -- Black formatter for Python
-  use 'jose-elias-alvarez/typescript.nvim' -- TypeScript tools
-  use 'OmniSharp/omnisharp-vim'          -- C# support
+call plug#end()
 
-  if packer_bootstrap then
-    require('packer').sync()
-  end
-end)
+" === Keybindings ===
+nnoremap <C-n> :NERDTreeToggle<CR>            " Toggle NERDTree
+nnoremap <C-p> :FZF<CR>                       " Open FZF fuzzy finder
+nnoremap <Leader>f :Files<CR>                 " Search for files
+nnoremap <Leader>g :GFiles<CR>                " Search Git files
+nnoremap <Leader>b :Buffers<CR>               " Search open buffers
+nnoremap <Leader>/ :BLines<CR>                " Search in buffer
 
--- Gruvbox configuration
-vim.cmd [[
-  set background=dark
-  colorscheme gruvbox
-]]
+" === CoC.nvim Configuration ===
+" Use <Tab> and <S-Tab> for navigation in completion menu
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 
--- Lualine configuration
-require('lualine').setup {
-  options = { theme = 'gruvbox' },
-}
+" Format on save
+autocmd BufWritePre *.js,*.jsx,*.ts,*.tsx,*.py,*.cs :call CocAction('format')
 
--- Nvim-Tree configuration
-require('nvim-tree').setup()
+" Set up language servers
+let g:coc_global_extensions = [
+\ 'coc-python',
+\ 'coc-tsserver',
+\ 'coc-html',
+\ 'coc-css',
+\ 'coc-json',
+\ 'coc-sh',
+\ 'coc-omnisharp'
+\]
 
--- Treesitter configuration
-require('nvim-treesitter.configs').setup {
-  ensure_installed = { "python", "javascript", "c_sharp", "html", "css", "bash", "json" },
-  highlight = { enable = true },
-  indent = { enable = true },
-}
+" === Airline Configuration ===
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_theme = 'gruvbox'
 
--- Mason configuration
-require("mason").setup()
-require("mason-lspconfig").setup {
-  ensure_installed = { "pyright", "tsserver", "omnisharp" },
-}
+" === GitGutter Configuration ===
+let g:gitgutter_enabled = 1
 
--- LSP setup
-local lspconfig = require('lspconfig')
-lspconfig.pyright.setup{}        -- Python LSP
-lspconfig.tsserver.setup{}       -- JavaScript/TypeScript LSP
-lspconfig.omnisharp.setup{}      -- C# LSP
+" === Auto-pairs Configuration ===
+let g:AutoPairsFlyMode = 1
 
--- Completion setup
-local cmp = require('cmp')
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      require('luasnip').lsp_expand(args.body)
-    end,
-  },
-  mapping = cmp.mapping.preset.insert({
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-  }),
-  sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-  }, {
-    { name = 'buffer' },
-  })
-}
+" === Python-Specific Settings ===
+autocmd FileType python setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
+
+" === JavaScript-Specific Settings ===
+autocmd FileType javascript setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+
+" === C#-Specific Settings ===
+autocmd FileType cs setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
+
+" === Miscellaneous ===
+set updatetime=300     " Faster completion
+set timeoutlen=500     " Faster key sequences
+set incsearch          " Incremental search
+set ignorecase         " Ignore case in searches
+set smartcase          " Case-sensitive if uppercase is used
+
+" Save session when leaving
+autocmd VimLeavePre * :mksession! ~/.vim/session.vim
